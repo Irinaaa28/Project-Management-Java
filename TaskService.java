@@ -48,7 +48,6 @@ public class TaskService
     public void modifyPriority(Task task, Priority priority) 
     {
         task.setPriority(priority);
-        System.out.println("Task priority modified to " + priority + " successfully!");
     }
 
     public void modifyDeadline(Task task, Deadline deadline) 

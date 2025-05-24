@@ -42,6 +42,16 @@ public class Task
         this.comments = new ArrayList<>();
     }
 
+    public Task(Task task) 
+    {
+        this.name = task.name;
+        this.status = task.status;
+        this.priority = task.priority;
+        this.deadline = new Deadline(task.deadline);
+        this.assignedMember = task.assignedMember;
+        this.comments = new ArrayList<>(task.comments);
+    }
+
     public int getId() 
     {
         return id;
@@ -84,6 +94,7 @@ public class Task
             return;
         }
         this.priority = priority;
+        System.out.println("Priority changed to " + priority + " successfully!");
     }
     public Deadline getDeadline() 
     {
