@@ -10,10 +10,20 @@ public class ProjectService
     }
 
     //checked
-    public Project createProject(String name, Manager manager, Customer customer, Deadline deadline, int estimatePrice) throws Exception
+    public Project createProject(String name, Manager manager, Customer customer, Deadline deadline) throws Exception
     {
         
-        Project project = new Project(name, manager, customer, deadline, estimatePrice);
+        Project project = new Project(name, manager, customer, deadline);
+        projects.add(project);
+        //System.out.println("Project created successfully!");
+        return project;
+        
+    }
+
+    public Project createProject(String name, Customer customer, Deadline deadline) 
+    {
+        
+        Project project = new Project(name, customer, deadline);
         projects.add(project);
         //System.out.println("Project created successfully!");
         return project;

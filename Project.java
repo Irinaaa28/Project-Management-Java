@@ -26,8 +26,15 @@ public class Project
         this.id = ++idProjectCounter;
     }
 
+    private int getRandomPrice()
+    {
+        int[] prices = {1000, 1500, 2000, 2500, 3000};
+        Random random = new Random();
+        return prices[random.nextInt(prices.length)];
+    }
+
     //checked
-    public Project(String name, Manager manager, Customer customer, Deadline deadline, int estimatePrice) throws Exception 
+    public Project(String name, Manager manager, Customer customer, Deadline deadline) throws Exception 
     {
         this.name = name;
 
@@ -72,7 +79,7 @@ public class Project
             throw new Exception("Invalid deadline. Cannot set deadline before the current time.");
 
         this.deadline = new Deadline(deadline);
-        this.estimatePrice = estimatePrice;
+        this.estimatePrice = getRandomPrice();
         this.finalPrice = estimatePrice;
         this.tasks = new ArrayList<>();
         this.members = new HashSet<>();
@@ -81,13 +88,13 @@ public class Project
     }
 
     //checked
-    public Project(String name, Customer customer, int estimatePrice)
+    public Project(String name, Customer customer, Deadline deadline)
     {
         this.name = name;
         this.manager = null;
         this.customer = customer;
-        this.deadline = new Deadline();
-        this.estimatePrice = estimatePrice;
+        this.deadline = new Deadline(deadline);
+        this.estimatePrice = getRandomPrice();
         this.finalPrice = estimatePrice;
         this.tasks = new ArrayList<>();
         this.members = new HashSet<>();
@@ -249,7 +256,6 @@ public class Project
         }
     }
 
-    //de pus in service
     //checked
     public void removeMember(Member member) throws Exception
     {

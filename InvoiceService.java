@@ -14,13 +14,10 @@ public class InvoiceService
         }
     }
 
-    public Invoice generateInvoice(Project project)
+    public Invoice generateInvoice(Project project) throws Exception
     {
         if (project.getProgress() != 100)
-        {
-            System.out.println("The project is not finished yet. Cannot generate invoice.");
-            return null;
-        }
+            throw new Exception("The project is not finished yet. Cannot generate invoice.");
         Invoice invoice = new Invoice(project);
         threeSecondsTimer();
         invoice.setReleased(true);

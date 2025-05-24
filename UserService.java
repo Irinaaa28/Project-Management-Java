@@ -43,4 +43,25 @@ public class UserService
             return null;
         }
     }
+    
+    public User getUserbyID(String id) 
+    {
+        for (Customer customer : customers) 
+        {
+            if (customer.getCustomerID().equals(id)) 
+                return customer;
+        }
+        for (Manager manager : managers) 
+        {
+            if (manager.getManagerID().equals(id)) 
+                return manager;
+        }
+        for (Member member : members) 
+        {
+            if (member.getMemberID().equals(id)) 
+                return member;
+        }
+        System.out.println("User not found.");
+        return null;
+    }
 }
