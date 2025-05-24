@@ -1,4 +1,4 @@
-public class Manager extends User 
+public final class Manager extends User 
 {
     private String department;
     private final String managerID;

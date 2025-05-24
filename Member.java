@@ -1,4 +1,4 @@
-public class Member extends User
+public final class Member extends User
 {
     private String level;
     private final String memberID;

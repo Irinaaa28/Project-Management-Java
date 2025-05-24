@@ -1,4 +1,4 @@
-public abstract class User 
+public abstract sealed class User permits Manager, Member, Customer
 {
     protected String name;
     protected String email;

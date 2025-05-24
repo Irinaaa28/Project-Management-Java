@@ -1,9 +1,11 @@
 import java.time.LocalDate;
+import java.util.Scanner;
 
 public class Main 
 {
     public static void main(String[] args) 
     {
+        Scanner scanner = new Scanner(System.in);
         ProjectService projectService = new ProjectService();
         TaskService taskService = new TaskService();
         NotificationService notificationService = new NotificationService();
@@ -21,6 +23,42 @@ public class Main
 
         Customer customer1 = new Customer("Alexandru Mihaescu", "alexandrumihaescu@gmail.com", "1002392");
         Customer customer2 = new Customer("Stefan Andrei", "stefanandrei@yahoo.com", "3629101");
+
+        // while (true)
+        // {
+        //     System.out.println("Welcome to the Project Management Platform!");
+        //     System.out.println("Before we start, you should sign in first.");
+        //     System.out.println("Please say which type of user you are: ");
+        //     System.out.println("1. Manager");
+        //     System.out.println("2. Member");
+        //     System.out.println("3. Customer");
+        //     String userType = scanner.nextLine();
+        //     if (userType.toUpperCase().equals("MANAGER")) {
+        //         System.out.println("Please enter your manager ID to login.");
+        //         String managerID = scanner.nextLine();
+                
+        //     } else if (userType.equals("2")) {
+        //         System.out.println("You are logged in as a Member.");
+        //         break;
+        //     } else if (userType.equals("3")) {
+        //         System.out.println("You are logged in as a Customer.");
+        //         break;
+        //     } else {
+        //         System.out.println("Invalid input. Please try again.");
+        //     }
+        // }
+
+
+
+
+
+
+
+
+
+
+
+
 
         try 
         {
