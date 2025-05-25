@@ -432,41 +432,244 @@ public class Main
                     }
                     break;
                 case "3": // Manager
+                    System.out.println("You have selected Manager.");
+                    System.out.println("Please enter your manager ID to login.");
+                    String managerID = scanner.nextLine();
+                    if (managerID.equals(manager1.getManagerID()) || managerID.equals(manager2.getManagerID()) || managerID.equals(manager3.getManagerID()))
+                    {
+                        System.out.println("You are logged in as a  Manager.");
+                        isRunning = false;
+                        boolean managerMenu = true;
+                        while (managerMenu) 
+                        {
+                            System.out.println("Manager Menu:");
+                            System.out.println("1. Projects");
+                            System.out.println("2. View a project");
+                            System.out.println("3. View a task");
+                            System.out.println("4. My projects");
+                            System.out.println("5. Logout");
+                            String memberChoice = scanner.nextLine();
+                            
+                            switch (memberChoice) 
+                            {
+                                case "1": 
+                                    projectService.showAllProjects();
+                                    break;
+                                case "2":
+                                    System.out.println("Please enter the project ID to view its details:");
+                                    String projectID = scanner.nextLine();
+                                    boolean found3 = false;
+                                    for (Project project : projectService.getProjects()) 
+                                    {
+                                        if (project.getId() == Integer.parseInt(projectID)) 
+                                        {
+                                            found3 = true;
+                                            System.out.println("a. Show tasks");
+                                            System.out.println("b. Assign the project to yourself");
+                                            System.out.println("c. Create a task");
+                                            System.out.println("d. Add a member to the project");
+                                            System.out.println("e. Remove a member from the project");
+                                            System.out.println("f. Generate invoice");
+                                            System.out.println("g. Exit");
+                                            String projectChoice = scanner.nextLine();
+                                            switch (projectChoice) 
+                                            {
+                                                case "a":
+                                                    System.out.println("i. Simple display");
+                                                    System.out.println("ii. Display by priority");
+                                                    System.out.println("iii. Display by deadline");
+                                                    System.out.println("iv. Display by user");
+                                                    String displayChoice = scanner.nextLine();
+                                                    switch (displayChoice) 
+                                                    {
+                                                        case "i":
+                                                            taskService.displayTasks(project);
+                                                            break;
+                                                        case "ii":
+                                                            taskService.displayTasksByPriority(project.getTasks());
+                                                            break;
+                                                        case "iii":
+                                                            taskService.displayTasksByDeadline(project.getTasks());
+                                                            break;
+                                                        case "iv":
+                                                            System.out.println("Please enter the member ID to filter tasks by user:");
+                                                            String membeID = scanner.nextLine();
+                                                            Member member = (Member) userService.getUserbyID(membeID);
+                                                            if (member != null) 
+                                                            {
+                                                                taskService.displayTasksByUser(projectService.getProjects(), member);
+                                                            } 
+                                                            else 
+                                                                System.out.println("Member not found. Please try again.");
+                                                            break;
+                                                        default:
+                                                            System.out.println("Invalid choice. Please try again.");
+                                                    }
+                                                    break;
+                                                case "b":
+                                                    if (!project.getMembers().contains(userService.getUserbyID(managerID))) 
+                                                        projectService.assignManager(project, (Manager)userService.getUserbyID(managerID));
+                                                    else 
+                                                        System.out.println("You are already assigned to this project.");
+                                                    break;
+
+                                                case "c":
+                                                    System.out.println("Please enter the task name:");
+                                                    String taskName = scanner.nextLine();
+                                                    System.out.println("Please enter the task priority (HIGH, MEDIUM, LOW):");
+                                                    String priorityInput = scanner.nextLine();
+                                                    Priority priority = Priority.valueOf(priorityInput.toUpperCase());
+                                                    System.out.println("Please enter the task deadline (DD/MM/YYYY):");
+                                                    String deadlineInput = scanner.nextLine();
+                                                    LocalDate deadlineDate = LocalDate.parse(deadlineInput, java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                                                    Deadline deadline = new Deadline(deadlineDate);
+                                                    
+                                                    try
+                                                    {
+                                                        taskService.createTask(project, taskName, priority, deadline);
+                                                    }
+                                                    catch (Exception e) 
+                                                    {
+                                                        System.out.println("Error creating task: " + e.getMessage());
+                                                    }
+                                                    break;
+                                                case "d":
+                                                    System.out.println("Please enter the member ID to add to the project:");
+                                                    String memberIDToAdd = scanner.nextLine();  
+                                                    Member memberToAdd = (Member) userService.getUserbyID(memberIDToAdd);
+                                                    if (memberToAdd != null) 
+                                                        projectService.addMember(project, memberToAdd);
+                                                    else 
+                                                        System.out.println("Member not found. Please try again.");
+                                                    break;
+                                                case "e":
+                                                    System.out.println("Please enter the member ID to remove from the project:");
+                                                    String memberIDToRemove = scanner.nextLine();
+                                                    Member memberToRemove = (Member) userService.getUserbyID(memberIDToRemove);
+                                                    if (memberToRemove != null) 
+                                                        projectService.removeMember(project, memberToRemove);
+                                                    else 
+                                                        System.out.println("Member not found. Please try again.");
+                                                    break;
+                                                case "f":
+                                                    try
+                                                    {
+                                                        Invoice invoice = invoiceService.generateInvoice(project);
+                                                        System.out.println("Invoice created successfully!");
+                                                    }
+                                                    catch (Exception e) 
+                                                    {
+                                                        System.out.println("Error generating invoice: " + e.getMessage());
+                                                    }
+                                                    break;
+                                                case "g":
+                                                    break;
+                                                default:
+                                                    System.out.println("Invalid choice. Please try again.");
+                                            }
+                                            break;
+                                        } 
+                                    }
+                                    if (!found3) 
+                                        System.out.println("Project not found. Please try again.");
+                                    break;
+                                case "3":
+                                    System.out.println("Please enter the task ID to view its details:");
+                                    String taskID = scanner.nextLine();
+                                    boolean found6 = false;
+                                    Task task1 = null;
+                                    for (Project project : projectService.getProjects()) 
+                                    {
+                                        Iterator<Task> it = project.getTasks().iterator();
+                                        while (it.hasNext())
+                                        {
+                                            Task task = it.next();
+                                            if (task.getId() == Integer.parseInt(taskID)) 
+                                            {
+                                                found6 = true;
+                                                task1 = task;
+                                                break;
+                                            }
+                                        }
+                                        if (task1 != null)
+                                        {
+                                            System.out.println("a. Deatils");
+                                            System.out.println("b. Modify priority");
+                                            System.out.println("c. Modify deadline");
+                                            System.out.println("d. Assign task to a member");
+                                            System.out.println("e. Exit");
+                                            String taskChoice = scanner.nextLine();
+                                            switch (taskChoice) 
+                                            {
+                                                case "a":
+                                                    taskService.showDetailsTask(task1);
+                                                    break;
+                                                case "b":
+                                                    System.out.println("Please enter the new priority (HIGH, MEDIUM, LOW):");
+                                                    String newPriorityInput = scanner.nextLine();
+                                                    Priority newPriority = Priority.valueOf(newPriorityInput.toUpperCase());
+                                                    taskService.modifyPriority(task1, newPriority);
+                                                    break;
+                                                case "c":
+                                                    System.out.println("Please enter the new deadline (DD/MM/YYYY):");
+                                                    String newDeadlineInput = scanner.nextLine();
+                                                    LocalDate newDeadlineDate = LocalDate.parse(newDeadlineInput, java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                                                    Deadline newDeadline = new Deadline(newDeadlineDate);
+                                                    taskService.modifyDeadline(task1, newDeadline);
+                                                    break;
+                                                case "d":
+                                                    System.out.println("Please enter the member ID to assign the task to:");
+                                                    String memberIDToAssign = scanner.nextLine();
+                                                    Member memberToAssign = (Member) userService.getUserbyID(memberIDToAssign);
+                                                    if (memberToAssign != null) 
+                                                        taskService.assignTask(task1, memberToAssign, project);
+                                                    else 
+                                                        System.out.println("Member not found. Please try again.");
+                                                    break;
+                                                case "e":
+                                                    break;
+                                                default:
+                                                    System.out.println("Invalid choice. Please try again.");
+                                            }
+                                        }
+                                    }
+                                    if (!found6) 
+                                        System.out.println("Task not found. Please try again.");
+                                    break;
+                                case "4":
+                                    System.out.println("Your projects:");
+                                    boolean found7 = false;
+                                    for (Project project : projectService.getProjects()) 
+                                    {
+                                        if (project.getManager().getManagerID().equals(managerID)) 
+                                        {
+                                            found7 = true;
+                                            System.out.println("Project ID: " + project.getId() + ", Name: " + project.getName());
+                                        }
+                                    }
+                                    if (!found7) 
+                                        System.out.println("You have no projects assigned.");
+                                    break;
+                                case "5":
+                                    managerMenu = false;
+                                    isRunning = true;
+                                    break;
+                                default:
+                                    System.out.println("Invalid choice. Please try again.");
+                            }
+                        }
+                    }
+                    else 
+                        System.out.println("Invalid Manager ID. Please try again.");
+                    break;
+                case "4": // Exit
+                    System.out.println("Exiting the application. Goodbye!");
+                    isRunning = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-                // case "1": // Manager
-                //     System.out.println("You have selected Manager.");
-                //     System.out.println("Please enter your manager ID to login.");
-                //     String managerID = scanner.nextLine();
-                //     if (managerID.equals(manager1.getManagerID()) || managerID.equals(manager2.getManagerID()) || managerID.equals(manager3.getManagerID())) 
-                //     {
-                //         System.out.println("You are logged in as a Manager.");
-                //         //isRunning = false;
-                //         boolean managerMenu = true;
-                //         while (managerMenu)
-                //         {
-                //             System.out.println("Manager Menu:
-                //             System.out.println")
-                //         }
-                //     } 
-                //     else 
-                //     {
-                //         System.out.println("Invalid Manager ID. Please try again.");
-                //     }
-                //     break;
-        //}
 }

@@ -30,6 +30,23 @@ public class ProjectService
         
     }
 
+    public void assignManager(Project project, Manager manager) 
+    {
+        try
+        {
+            if (manager.getDepartment().compareTo("PROJECT") != 0)
+                throw new Exception("The manager must be a project manager.");
+            if (project.getManager() != null)
+                throw new Exception("Project already has a manager assigned.");
+            project.setManager(manager);
+            System.out.println("Manager assigned successfully!");
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
     // checked
     public void addMember(Project project, Member member)
     {

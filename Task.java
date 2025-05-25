@@ -32,6 +32,16 @@ public class Task
         this.comments = new ArrayList<>();
     }
 
+    public Task(String name, Priority priority, Deadline deadline) 
+    {
+        this.name = name;
+        this.status = Status.TO_DO;
+        this.priority = priority;
+        this.deadline = new Deadline(deadline);
+        this.assignedMember = null;
+        this.comments = new ArrayList<>();
+    }
+
     public Task(String name)
     {
         this.name = name;

@@ -12,6 +12,12 @@ public class TaskService
         System.out.println("Task " + name + " created and assigned to " + assignedMember.getName() + " successfully!");
     }
 
+    public void createTask(Project project, String name, Priority priority, Deadline deadline) throws Exception
+    {
+        project.addTask(new Task(name, priority, deadline));
+        System.out.println("Task " + name + " created successfully!");
+    }
+
     //checked
     public void createTask(Project project, String name) 
     {
