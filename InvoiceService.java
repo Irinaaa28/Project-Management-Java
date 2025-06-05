@@ -32,4 +32,14 @@ public class InvoiceService
             System.out.println("Invoice ID: " + invoice.getId() + ", Project: " + invoice.getProject().getName() + ", Amount: " + invoice.getAmount() + ", Release Date: " + invoice.getReleaseDate() + ", Released: " + invoice.isReleased());
         }
     }
+
+    public void deleteInvoice(Invoice invoice) 
+    {
+        if (invoices.contains(invoice)) {
+            invoices.remove(invoice);
+            System.out.println("Invoice with ID: " + invoice.getId() + " has been deleted.");
+        } else {
+            System.out.println("Invoice not found.");
+        }
+    }
 }

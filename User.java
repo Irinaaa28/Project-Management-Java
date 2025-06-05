@@ -5,6 +5,7 @@ public abstract sealed class User permits Manager, Member, Customer
 
     public User(String name, String email) 
     {
+
         this.name = name;
         this.email = email;
     }

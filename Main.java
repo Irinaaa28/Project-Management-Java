@@ -17,6 +17,18 @@ public class Main
         Manager manager2 = new Manager("Mihaela Dascalu", "mihaeladascalu@gmail.com","hr", "hrmanager");
         Manager manager3 = new Manager("Daniela Rosca", "danielarosca@gmail.com", "Marketing", "marketingmanager");
 
+        //Test if db works
+        ManagerDAO managerDAO = ManagerDAO.getInstance();
+        try 
+        {
+            managerDAO.add(manager1);
+            System.out.println("Manager 1 added successfully.");
+        } 
+        catch (Exception e) 
+        {
+            System.out.println("Error adding managers: " + e.getMessage());
+        }
+
         Member member1 = new Member("Matei Dinu", "mateidinu@yahoo.com", "Senior", "1001");
         Member member2 = new Member("Ana Damian", "anadamian@gmail.com", "Junior", "1002");
         Member member3 = new Member("Anca Dima", "ancadima@gmail.com", "Senior", "1003");

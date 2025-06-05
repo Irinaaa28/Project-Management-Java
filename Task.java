@@ -1,6 +1,4 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Task 
 {
@@ -11,7 +9,6 @@ public class Task
     private Priority priority;
     private Deadline deadline;
     private Member assignedMember;
-    private List<String> comments;
 
     static 
     {
@@ -29,7 +26,6 @@ public class Task
         this.priority = priority;
         this.deadline = new Deadline(deadline);
         this.assignedMember = assignedMember;
-        this.comments = new ArrayList<>();
     }
 
     public Task(String name, Priority priority, Deadline deadline) 
@@ -39,7 +35,6 @@ public class Task
         this.priority = priority;
         this.deadline = new Deadline(deadline);
         this.assignedMember = null;
-        this.comments = new ArrayList<>();
     }
 
     public Task(String name)
@@ -49,7 +44,6 @@ public class Task
         this.priority = Priority.LOW;
         this.deadline = new Deadline();
         this.assignedMember = null;
-        this.comments = new ArrayList<>();
     }
 
     public Task(Task task) 
@@ -59,7 +53,6 @@ public class Task
         this.priority = task.priority;
         this.deadline = new Deadline(task.deadline);
         this.assignedMember = task.assignedMember;
-        this.comments = new ArrayList<>(task.comments);
     }
 
     public int getId() 
@@ -131,18 +124,6 @@ public class Task
     public void setAssignedMember(Member assignedMember) 
     {
         this.assignedMember = assignedMember;
-    }
-    public List<String> getComments() 
-    {
-        return comments;
-    }
-    public void addComment(String comment) 
-    {
-        comments.add(comment);
-    }
-    public void removeComment(String comment) 
-    {
-        comments.remove(comment);
     }
     public boolean isComplete()
     {
