@@ -1,35 +1,34 @@
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class CustomerDAO extends GenericDAO<Customer> 
+public class CustomerService extends GenericService<Customer> 
 {
-    private static CustomerDAO instance;
+    private static CustomerService instance;
 
-    private CustomerDAO() 
+    private CustomerService() 
     {
         super();
     }
 
-    public static CustomerDAO getInstance() 
+    public static CustomerService getInstance() 
     {
         if (instance == null) 
-            instance = new CustomerDAO();
+            instance = new CustomerService();
         return instance;
     }
 
     @Override
     public void add(Customer customer) throws SQLException 
     {
-        String sql = "INSERT INTO customers (id, name, email) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO customers (id, name, email, customer_id) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) 
         {
-            pstmt.setString(1, customer.getCustomerID());
+            pstmt.setInt(1, customer.getId());
             pstmt.setString(2, customer.getName());
             pstmt.setString(3, customer.getEmail());
+            pstmt.setString(4, customer.getCustomerID());
             pstmt.executeUpdate();
         }
     }
@@ -45,24 +44,24 @@ public class CustomerDAO extends GenericDAO<Customer>
         {
             while (rs.next()) 
             {
-                Customer customer = new Customer(rs.getString("name"), rs.getString("email"), rs.getString("id"));
+                Customer customer = new Customer(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("customer_id"));
                 customers.add(customer);
             }
         }
         return customers;
     }
 
-    public Customer getById(String id) throws SQLException 
+    public Customer getById(int id) throws SQLException 
     {
         String sql = "SELECT * FROM customers WHERE id = ?";
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) 
         {
-            pstmt.setString(1, id);
+            pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) 
             {
-                return new Customer(rs.getString("name"), rs.getString("email"), rs.getString("id"));
+                return new Customer(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("customer_id"));
             }
         }
         return null;
@@ -77,7 +76,7 @@ public class CustomerDAO extends GenericDAO<Customer>
         {
             pstmt.setString(1, customer.getName());
             pstmt.setString(2, customer.getEmail());
-            pstmt.setString(3, customer.getCustomerID());
+            pstmt.setInt(3, customer.getId());
             pstmt.executeUpdate();
         }
     }
@@ -89,9 +88,8 @@ public class CustomerDAO extends GenericDAO<Customer>
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) 
         {
-            pstmt.setString(1, customer.getCustomerID());
+            pstmt.setInt(1, customer.getId());
             pstmt.executeUpdate();
         }
     }
-    
 }

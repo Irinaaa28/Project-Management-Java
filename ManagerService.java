@@ -2,34 +2,35 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ManagerDAO extends GenericDAO<Manager> 
+public class ManagerService extends GenericService<Manager> 
 {
 
-    private static ManagerDAO instance;
+    private static ManagerService instance;
 
-    private ManagerDAO() 
+    private ManagerService() 
     {
         super();
     }
 
-    public static ManagerDAO getInstance() 
+    public static ManagerService getInstance() 
     {
         if (instance == null) 
-            instance = new ManagerDAO();
+            instance = new ManagerService();
         return instance;
     }
 
     @Override
     public void add(Manager manager) throws SQLException 
     {
-        String sql = "INSERT INTO managers (id, name, email, department) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO managers (id, name, email, department, manager_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) 
         {
-            pstmt.setString(1, manager.getManagerID());
+            pstmt.setInt(1, manager.getId());
             pstmt.setString(2, manager.getName());
             pstmt.setString(3, manager.getEmail());
             pstmt.setString(4, manager.getDepartment());
+            pstmt.setString(5, manager.getManagerID());
             pstmt.executeUpdate();
         }
     }
@@ -45,25 +46,25 @@ public class ManagerDAO extends GenericDAO<Manager>
         {
             while (rs.next()) 
             {
-                Manager manager = new Manager(rs.getString("id"), rs.getString("name"), rs.getString("email"), rs.getString("department"));
+                Manager manager = new Manager(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("department"), rs.getString("manager_id"));
                 managers.add(manager);
             }
         }
         return managers;
     }
 
-    public Manager getById(String id) throws SQLException 
+    public Manager getById(int id) throws SQLException 
     {
         String sql = "SELECT * FROM managers WHERE id = ?";
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) 
         {
-            pstmt.setString(1, id);
+            pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) 
             {
                 if (rs.next()) 
                 {
-                    return new Manager(rs.getString("id"), rs.getString("name"), rs.getString("email"), rs.getString("department"));
+                    return new Manager(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("department"), rs.getString("manager_id"));
                 }
             }
         }
@@ -80,9 +81,11 @@ public class ManagerDAO extends GenericDAO<Manager>
             pstmt.setString(1, manager.getName());
             pstmt.setString(2, manager.getEmail());
             pstmt.setString(3, manager.getDepartment());
-            pstmt.setString(4, manager.getManagerID());
+            pstmt.setInt(4, manager.getId());
             pstmt.executeUpdate();
         }
+
+
     }
 
     @Override
@@ -92,10 +95,8 @@ public class ManagerDAO extends GenericDAO<Manager>
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) 
         {
-            pstmt.setString(1, manager.getManagerID());
+            pstmt.setInt(1, manager.getId());
             pstmt.executeUpdate();
         }
-    }
-
-    
+    }    
 }

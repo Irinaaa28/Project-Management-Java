@@ -24,7 +24,7 @@ public class Invoice
         this.releaseDate = LocalDate.now();
         project.calculateFinalPrice();
         this.amount = project.getFinalPrice();
-        this.isReleased = false;
+        this.isReleased = true;
     }
 
     //generateInvoice - de pus in service

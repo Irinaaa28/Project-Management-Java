@@ -2,32 +2,32 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MemberDAO extends GenericDAO<Member> 
+public class MemberService extends GenericService<Member> 
 {
+    private static MemberService instance;
 
-    private static MemberDAO instance;
-
-    private MemberDAO() 
+    private MemberService() 
     {
         super();
     }
 
-    public static MemberDAO getInstance() 
+    public static MemberService getInstance() 
     {
         if (instance == null) 
-            instance = new MemberDAO();
+            instance = new MemberService();
         return instance;
     }
 
     @Override
     public void add(Member member) throws SQLException {
-        String sql = "INSERT INTO members (id, name, email, level) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO members (id, name, email, level, member_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, member.getMemberID());
+            pstmt.setInt(1, member.getId());
             pstmt.setString(2, member.getName());
             pstmt.setString(3, member.getEmail());
             pstmt.setString(4, member.getLevel());
+            pstmt.setString(5, member.getMemberID());
             pstmt.executeUpdate();
         }
     }
@@ -42,28 +42,30 @@ public class MemberDAO extends GenericDAO<Member>
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) 
             {
-                String id = rs.getString("id");
+                int id = rs.getInt("id");
+                String member_id = rs.getString("member_id");
                 String name = rs.getString("name");
                 String email = rs.getString("email");
                 String level = rs.getString("level");
-                members.add(new Member(name, email, level, id));
+                members.add(new Member(id, name, email, level, member_id));
             }
         }
         return members;
     }
 
-    public Member getById(String id) throws SQLException 
+    public Member getById(int id) throws SQLException 
     {
         String sql = "SELECT * FROM members WHERE id = ?";
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
+            pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     String name = rs.getString("name");
                     String email = rs.getString("email");
                     String level = rs.getString("level");
-                    return new Member(name, email, level, id);
+                    String member_id = rs.getString("member_id");
+                    return new Member(id, name, email, level, member_id);
                 }
             }
         }
@@ -76,11 +78,11 @@ public class MemberDAO extends GenericDAO<Member>
         String sql = "UPDATE members SET name = ?, email = ?, level = ? WHERE id = ?";
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, member.getName());
-            pstmt.setString(2, member.getEmail());
-            pstmt.setString(3, member.getLevel());
-            pstmt.setString(4, member.getMemberID());
-            pstmt.executeUpdate();
+                 pstmt.setString(1, member.getName());
+                 pstmt.setString(2, member.getEmail());
+                 pstmt.setString(3, member.getLevel());
+                 pstmt.setInt(4, member.getId());
+                 pstmt.executeUpdate();
         }
     }
 
@@ -90,7 +92,7 @@ public class MemberDAO extends GenericDAO<Member>
         String sql = "DELETE FROM members WHERE id = ?";
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, member.getMemberID());
+            pstmt.setInt(1, member.getId());
             pstmt.executeUpdate();
         }
     }

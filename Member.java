@@ -3,15 +3,15 @@ public final class Member extends User
     private String level;
     private final String memberID;
 
-    public Member(String name, String email, String level, String memberID) 
+    public Member(int id, String name, String email, String level, String memberID) 
     {
-        super(name, email);
+        super(id, name, email);
         this.level = level.toUpperCase();
         this.memberID = memberID;
     }
-    public Member(String name, String email, String memberID) 
+    public Member(int id, String name, String email, String memberID) 
     {
-        super(name, email);
+        super(id, name, email);
         this.level = "None";
         this.memberID = memberID;
     }
@@ -20,6 +20,13 @@ public final class Member extends User
         super();
         this.level = "None";
         this.memberID = "None";
+    }
+
+    public Member (Member member) 
+    {
+        super(member);
+        this.level = member.level;
+        this.memberID = member.memberID;
     }
     public String getLevel() 
     {

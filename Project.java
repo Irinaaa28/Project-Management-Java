@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Project 
 {
-    private static int idProjectCounter;
+    //private static int idProjectCounter;
     private final int id;
     private final String name;
     private Manager manager;
@@ -17,14 +17,14 @@ public class Project
     private double progress;
     private int lateDays;
 
-    static 
-    {
-        idProjectCounter = 0;
-    }
+    // static 
+    // {
+    //     idProjectCounter = 0;
+    // }
 
-    {
-        this.id = ++idProjectCounter;
-    }
+    // {
+    //     this.id = ++idProjectCounter;
+    // }
 
     private int getRandomPrice()
     {
@@ -34,8 +34,9 @@ public class Project
     }
 
     //checked
-    public Project(String name, Manager manager, Customer customer, Deadline deadline) throws Exception 
+    public Project(int id, String name, Manager manager, Customer customer, Deadline deadline) throws Exception 
     {
+        this.id = id;
         this.name = name;
 
         // try
@@ -51,7 +52,7 @@ public class Project
         //     this.manager = null;
         // }
 
-        if (manager.getDepartment().compareTo("PROJECT") == 0)
+        if (manager.getDepartment().equals("PROJECT"))
                 this.manager = manager;
         else
         {
@@ -88,8 +89,9 @@ public class Project
     }
 
     //checked
-    public Project(String name, Customer customer, Deadline deadline)
+    public Project(int id, String name, Customer customer, Deadline deadline)
     {
+        this.id = id;
         this.name = name;
         this.manager = null;
         this.customer = customer;
@@ -191,7 +193,6 @@ public class Project
         return members;
     }
 
-    //de pus in service
     public void addTask(Task task)
     {
         if (task == null) 

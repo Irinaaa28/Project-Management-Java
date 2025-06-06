@@ -1,12 +1,12 @@
 import java.sql.*;
 import java.util.List;
 
-public abstract class GenericDAO<T> 
+public abstract class GenericService<T> 
 {
-    private static final java.util.Map<Class<?>, GenericDAO<?>> instances = new java.util.HashMap<>();
+    private static final java.util.Map<Class<?>, GenericService<?>> instances = new java.util.HashMap<>();
 
     @SuppressWarnings("unchecked")
-    public static synchronized <T> GenericDAO<T> getInstance(Class<? extends GenericDAO<T>> daoClass) 
+    public static synchronized <T> GenericService<T> getInstance(Class<? extends GenericService<T>> daoClass) 
     {
         if (!instances.containsKey(daoClass)) 
         {
@@ -18,7 +18,7 @@ public abstract class GenericDAO<T>
                 throw new RuntimeException("Cannot instantiate DAO: " + daoClass, e);
             }
         }
-        return (GenericDAO<T>) instances.get(daoClass);
+        return (GenericService<T>) instances.get(daoClass);
     }
 
     public abstract void add(T obj) throws SQLException;

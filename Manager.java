@@ -3,15 +3,15 @@ public final class Manager extends User
     private String department;
     private final String managerID;
 
-    public Manager(String name, String email, String department, String managerID) 
+    public Manager(int id, String name, String email, String department, String managerID) 
     {
-        super(name, email);
+        super(id, name, email);
         this.department = department.toUpperCase();
         this.managerID = managerID;
     }
-    public Manager(String name, String email, String managerID) 
+    public Manager(int id, String name, String email, String managerID) 
     {
-        super(name, email);
+        super(id, name, email);
         this.department = "None";
         this.managerID = managerID;
     }
@@ -20,6 +20,13 @@ public final class Manager extends User
         super();
         this.department = "None";
         this.managerID = "None";
+    }
+
+    public Manager(Manager manager) 
+    {
+        super(manager);
+        this.department = manager.department;
+        this.managerID = manager.managerID;
     }
 
     public String getManagerID() 

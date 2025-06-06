@@ -1,73 +1,138 @@
-import java.util.*;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-public class TaskService 
+public class TaskService extends GenericService<Task> 
 {
-    //checked
-    public void createTask(Project project, String name, Priority priority, Deadline deadline, Member assignedMember) throws Exception
+
+    private static TaskService instance;
+
+    private TaskService() 
     {
-        long count = project.getTasks().stream().filter(t -> t.getAssignedMember() != null && t.getAssignedMember().equals(assignedMember)).count();
-        if (count >= 3) 
-            throw new Exception("Member " + assignedMember.getName() + " already has 3 tasks assigned. Cannot assign more tasks.");
-        project.addTask(new Task(name, priority, deadline, assignedMember));
-        System.out.println("Task " + name + " created and assigned to " + assignedMember.getName() + " successfully!");
+        super();
     }
 
-    public void createTask(Project project, String name, Priority priority, Deadline deadline) throws Exception
+    public static synchronized TaskService getInstance() 
     {
-        project.addTask(new Task(name, priority, deadline));
-        System.out.println("Task " + name + " created successfully!");
+        if (instance == null) 
+            instance = new TaskService();
+        return instance;
     }
 
-    //checked
-    public void createTask(Project project, String name) 
+    @Override
+    public void add(Task task) throws SQLException 
     {
-        project.addTask(new Task(name));
-        System.out.println("Task " + name + " created successfully!");
+        String sql = "INSERT INTO tasks (id, name, status, priority, deadline, assigned_member_id, project_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, task.getId());
+            pstmt.setString(2, task.getName());
+            pstmt.setString(3, task.getStatus().toString());
+            pstmt.setString(4, task.getPriority().toString());
+            pstmt.setDate(5, java.sql.Date.valueOf(task.getDeadline().getDate()));
+            if (task.getAssignedMember() != null) 
+                pstmt.setInt(6, task.getAssignedMember().getId());
+            else 
+                pstmt.setNull(6, Types.INTEGER); 
+            pstmt.setInt(7, task.getProject().getId());
+            pstmt.executeUpdate();
+        }   
     }
 
-    //checked
-    public void assignTask(Task task, Member member, Project project) 
+    @Override
+    public List<Task> getAll() throws SQLException 
     {
-        long count = project.getTasks().stream().filter(t -> t.getAssignedMember() != null && t.getAssignedMember().equals(member)).count();
-        if (count >= 3) {
-            System.out.println("Member " + member.getName() + " already has 3 tasks assigned. Cannot assign more tasks.");
-            return;
+        List<Task> tasks = new ArrayList<>();
+        String sql = "SELECT * FROM tasks";
+        try (Connection conn = DBConnection.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                Status status = Status.valueOf(rs.getString("status").toUpperCase());
+                String priorityStr = rs.getString("priority");
+                LocalDate deadlineDate = rs.getDate("deadline").toLocalDate();
+                int assigned_member_id = rs.getInt("assigned_member_id");
+                int projectId = rs.getInt("project_id");
+
+                Priority priority = Priority.valueOf(priorityStr.toUpperCase());
+                Member assignedMember = null;
+                if (assigned_member_id != 0) 
+                    assignedMember = MemberService.getInstance().getById(assigned_member_id);
+                else
+                    assignedMember = new Member(); 
+                Project project = ProjectService.getInstance().getById(projectId);
+                Task task = new Task(id, name, priority, new Deadline(deadlineDate), assignedMember, project);
+                tasks.add(task);
+            }
+            return tasks;
         }
-        try
-        {
-            project.removeTask(task);
-        }catch (Exception e)
-        {
-            System.out.println(e.getMessage());
+    }
+
+    public Task getById(int id) throws SQLException 
+    {
+        String sql = "SELECT * FROM tasks WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String name = rs.getString("name");
+                    Status status = Status.valueOf(rs.getString("status").toUpperCase());
+                    String priorityStr = rs.getString("priority");
+                    LocalDate deadlineDate = rs.getDate("deadline").toLocalDate();
+                    int assigned_member_id = rs.getInt("assigned_member_id");
+                    int projectId = rs.getInt("project_id");
+
+                    Priority priority = Priority.valueOf(priorityStr.toUpperCase());
+                    Member assignedMember = null;
+                    if (assigned_member_id != 0) 
+                        assignedMember = MemberService.getInstance().getById(assigned_member_id);
+                    else
+                        assignedMember = new Member(); 
+                    Project project = ProjectService.getInstance().getById(projectId);
+                    return new Task(id, name, priority, new Deadline(deadlineDate), assignedMember, project);
+                }
+            }
         }
-            task.setAssignedMember(member);
-        project.addTask(task);
-        System.out.println("Task assigned to " + member.getName() + " successfully!");
+        return null;
     }
 
-    //checked
-    public void modifyStatus(Task task, Status status) 
+    public List<Task> getByProject(Project project) throws SQLException 
     {
-        task.setStatus(status);
-        System.out.println("Task status modified to " + status + " successfully!");
-    }
-    public void modifyPriority(Task task, Priority priority) 
-    {
-        task.setPriority(priority);
+        List<Task> tasks = new ArrayList<>();
+        String sql = "SELECT * FROM tasks WHERE project_id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, project.getId());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    String name = rs.getString("name");
+                    Status status = Status.valueOf(rs.getString("status").toUpperCase());
+                    String priorityStr = rs.getString("priority");
+                    LocalDate deadlineDate = rs.getDate("deadline").toLocalDate();
+                    int assigned_member_id = rs.getInt("assigned_member_id");
+
+                    Priority priority = Priority.valueOf(priorityStr.toUpperCase());
+                    Member assignedMember = null;
+                    if (assigned_member_id != 0) 
+                        assignedMember = MemberService.getInstance().getById(assigned_member_id);
+                    else
+                        assignedMember = new Member(); 
+                    Task task = new Task(id, name, priority, new Deadline(deadlineDate), assignedMember, project);
+                    tasks.add(task);
+                }
+            }
+        }
+        for (Task t: tasks)
+            System.out.println("Task Name: " + t.getName() + ", Status: " + t.getStatus() + ", Priority: " + t.getPriority() + ", Deadline: " + t.getDeadline().getDate().toString());
+        return tasks;
     }
 
-    public void modifyDeadline(Task task, Deadline deadline) 
-    {
-        task.setDeadline(deadline);
-        System.out.println("Task deadline modified to " + deadline.getDate().toString() + " successfully!");
-    }
-    public void modifyDeadline(Project project, Deadline deadline) 
-    {
-        project.setDeadline(deadline);
-        System.out.println("Project deadline modified to " + deadline.getDate().toString() + " successfully!");
-    }
-
-    //checked
     public void showDetailsTask(Task task) 
     {
         System.out.println("Task Name: " + task.getName());
@@ -76,48 +141,177 @@ public class TaskService
         System.out.println("Deadline: " + task.getDeadline().getDate().toString());
         System.out.println("Assigned Member: " + (task.getAssignedMember() != null ? task.getAssignedMember().getName() : "None"));
     }
-    //checked
-    public void displayTasks(Project project)
+
+    public void displayTasksByUser(Member member) 
     {
-        for (Task task : project.getTasks()) 
+        String sql = "SELECT * FROM tasks WHERE assigned_member_id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, member.getId());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    String name = rs.getString("name");
+                    String priorityStr = rs.getString("priority");
+                    LocalDate deadlineDate = rs.getDate("deadline").toLocalDate();
+                    Member assignedMember = MemberService.getInstance().getById(rs.getInt("assigned_member_id"));
+                    Status status = Status.valueOf(rs.getString("status").toUpperCase());
+                    int projectId = rs.getInt("project_id");
+                    Project project = ProjectService.getInstance().getById(projectId);
+                    Priority priority = Priority.valueOf(priorityStr.toUpperCase());
+                    Task task = new Task(id, name, priority, new Deadline(deadlineDate), member);
+                    showDetailsTask(task);
+                }
+            }
+        } 
+        catch (SQLException e) 
         {
-            System.out.println("Task Name: " + task.getName() + ", Status: " + task.getStatus() + ", Priority: " + task.getPriority() + ", Deadline: " + task.getDeadline().getDate().toString());
+            e.printStackTrace();
         }
     }
-    //checked
-    public void displayTasksByUser(List<Project> projects, Member member) 
-    {
-        for (Project project : projects) 
-            for (Task task : project.getTasks()) 
-                if (task.getAssignedMember() != null && task.getAssignedMember().equals(member)) 
-                    System.out.println("Task Name: " + task.getName() + ", Status: " + task.getStatus() + ", Priority: " + task.getPriority() + ", Deadline: " + task.getDeadline().getDate().toString()); 
-    }
 
-    public void displayTasksByPriority(List<Task> tasks)
+    public void displayTasksByPriority() 
     {
+        List<Task> tasks = new ArrayList<>();
+        String sql = "SELECT * FROM tasks";
+        try (Connection conn = DBConnection.connect();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String priorityStr = rs.getString("priority");
+                LocalDate deadlineDate = rs.getDate("deadline").toLocalDate();
+                int assigned_member_id = rs.getInt("assigned_member_id");
+                Status status = Status.valueOf(rs.getString("status").toUpperCase());
+                int projectId = rs.getInt("project_id");
+
+                Priority priority = Priority.valueOf(priorityStr.toUpperCase());
+                Member assignedMember = null;
+                if (assigned_member_id != 0) 
+                    assignedMember = MemberService.getInstance().getById(assigned_member_id);
+                else
+                    assignedMember = new Member();
+                Project project = ProjectService.getInstance().getById(projectId);
+                Task task = new Task(id, name, priority, new Deadline(deadlineDate), assignedMember, project);
+                tasks.add(task);
+            }
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
         tasks.sort(Comparator.comparing(Task::getPriority).reversed());
         for (Task t: tasks)
             System.out.println("Task Name: " + t.getName() + ", Status: " + t.getStatus() + ", Priority: " + t.getPriority() + ", Deadline: " + t.getDeadline().getDate().toString());
     }
 
-    public void displayTasksByDeadline(List<Task> tasks)
+    public void displayTasksByDeadline() 
     {
+        List<Task> tasks = new ArrayList<>();
+        String sql = "SELECT * FROM tasks";
+        try (Connection conn = DBConnection.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String priorityStr = rs.getString("priority");
+                LocalDate deadlineDate = rs.getDate("deadline").toLocalDate();
+                int assigned_member_id = rs.getInt("assigned_member_id");
+                Status status = Status.valueOf(rs.getString("status").toUpperCase());
+                int projectId = rs.getInt("project_id");
+
+                Priority priority = Priority.valueOf(priorityStr.toUpperCase());
+                Member assignedMember = null;
+                if (assigned_member_id != 0) 
+                    assignedMember = MemberService.getInstance().getById(assigned_member_id);
+                else
+                    assignedMember = new Member();
+                Project project = ProjectService.getInstance().getById(projectId);
+                Task task = new Task(id, name, priority, new Deadline(deadlineDate), assignedMember, project);
+                tasks.add(task);
+            }
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
         tasks.sort(Comparator.comparing(t -> t.getDeadline().getDate()));
         for (Task t: tasks)
             System.out.println("Task Name: " + t.getName() + ", Status: " + t.getStatus() + ", Priority: " + t.getPriority() + ", Deadline: " + t.getDeadline().getDate().toString());
     }
 
-    //checked
-    public void deleteTask(Task task, Project project) 
+    @Override
+    public void update(Task task) throws SQLException 
     {
-        try
-        {
-            project.removeTask(task);
-            System.out.println("Task deleted successfully!");
+        String sql = "UPDATE tasks SET name = ?, priority = ?, deadline = ?, assigned_member_id = ? WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, task.getId());
+            pstmt.setString(2, task.getName());
+            pstmt.setString(3, task.getPriority().toString());
+            pstmt.setDate(4, java.sql.Date.valueOf(task.getDeadline().getDate()));
+            if (task.getAssignedMember() != null) 
+                pstmt.setInt(5, task.getAssignedMember().getId());
+            else 
+                pstmt.setNull(5, Types.INTEGER); 
+            pstmt.executeUpdate();
         }
-        catch (Exception e) 
-        {
-            System.out.println(e.getMessage());
+    }
+
+    public void assignTask(Task task, Member member) throws SQLException 
+    {
+        String sql = "UPDATE tasks SET assigned_member_id = ? WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, member.getId());
+            pstmt.setInt(2, task.getId());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void modifyStatus(Task task, Status status) throws SQLException 
+    {
+        String sql = "UPDATE tasks SET status = ? WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, status.toString());
+            pstmt.setInt(2, task.getId());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void modifyPriority(Task task, Priority priority) throws SQLException 
+    {
+        String sql = "UPDATE tasks SET priority = ? WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, priority.toString());
+            pstmt.setInt(2, task.getId());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void modifyDeadline(Task task, Deadline deadline) throws SQLException 
+    {
+        String sql = "UPDATE tasks SET deadline = ? WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, java.sql.Date.valueOf(deadline.getDate()));
+            pstmt.setInt(2, task.getId());
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void delete(Task task) throws SQLException 
+    {
+        String sql = "DELETE FROM tasks WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, task.getId());
+            pstmt.executeUpdate();
         }
     }
 }
