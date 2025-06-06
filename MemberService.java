@@ -29,6 +29,7 @@ public class MemberService extends GenericService<Member>
             pstmt.setString(4, member.getLevel());
             pstmt.setString(5, member.getMemberID());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("AddMember");
         }
     }
 
@@ -49,6 +50,7 @@ public class MemberService extends GenericService<Member>
                 String level = rs.getString("level");
                 members.add(new Member(id, name, email, level, member_id));
             }
+            //AuditService.getInstance().logAction("GetAllMembers");
         }
         return members;
     }
@@ -65,6 +67,7 @@ public class MemberService extends GenericService<Member>
                     String email = rs.getString("email");
                     String level = rs.getString("level");
                     String member_id = rs.getString("member_id");
+                    //AuditService.getInstance().logAction("GetMemberById");
                     return new Member(id, name, email, level, member_id);
                 }
             }
@@ -83,6 +86,7 @@ public class MemberService extends GenericService<Member>
                  pstmt.setString(3, member.getLevel());
                  pstmt.setInt(4, member.getId());
                  pstmt.executeUpdate();
+                 //AuditService.getInstance().logAction("UpdateMember");
         }
     }
 
@@ -94,6 +98,7 @@ public class MemberService extends GenericService<Member>
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, member.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("DeleteMember");
         }
     }
     

@@ -32,6 +32,7 @@ public class ManagerService extends GenericService<Manager>
             pstmt.setString(4, manager.getDepartment());
             pstmt.setString(5, manager.getManagerID());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("AddManager");
         }
     }
 
@@ -49,6 +50,7 @@ public class ManagerService extends GenericService<Manager>
                 Manager manager = new Manager(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("department"), rs.getString("manager_id"));
                 managers.add(manager);
             }
+            //AuditService.getInstance().logAction("GetAllManagers");
         }
         return managers;
     }
@@ -64,9 +66,11 @@ public class ManagerService extends GenericService<Manager>
             {
                 if (rs.next()) 
                 {
+                    //AuditService.getInstance().logAction("GetManagerById");
                     return new Manager(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("department"), rs.getString("manager_id"));
                 }
             }
+
         }
         return null; 
     }
@@ -83,6 +87,7 @@ public class ManagerService extends GenericService<Manager>
             pstmt.setString(3, manager.getDepartment());
             pstmt.setInt(4, manager.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("UpdateManager");
         }
 
 
@@ -97,6 +102,7 @@ public class ManagerService extends GenericService<Manager>
         {
             pstmt.setInt(1, manager.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("DeleteManager");
         }
     }    
 }

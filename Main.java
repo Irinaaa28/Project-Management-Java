@@ -116,6 +116,7 @@ public class Main
                                                     {
                                                         int nextIndex = projectService.getAll().size() + 1;
                                                         projectService.add(new Project(nextIndex, projectName, assignedManager, customer, deadline));
+                                                        AuditService.getInstance().logAction("Project created by customer: " + customer.getName() + ", Project Name: " + projectName);
                                                         System.out.println("Project created successfully!");
                                                     }
                                                 }
@@ -128,6 +129,7 @@ public class Main
                                             {
                                                 int nextIndex = projectService.getAll().size() + 1;
                                                 projectService.add(new Project(nextIndex, projectName, customer, deadline));
+                                                AuditService.getInstance().logAction("Project created by customer: " + customer.getName() + ", Project Name: " + projectName);
                                                 System.out.println("Project created successfully!");
                                             }
                                             break;
@@ -141,6 +143,7 @@ public class Main
                                                 {
                                                     found = true;
                                                     System.out.println("Progress: " + project.getProgress() + "%");
+                                                    AuditService.getInstance().logAction("Project progress checked by customer: " + customer.getName() + ", Project ID: " + projectID);
                                                     break;
                                                 }
                                             }
@@ -159,6 +162,7 @@ public class Main
                                                     try
                                                     {
                                                         invoiceService.add(new Invoice(project));
+                                                        AuditService.getInstance().logAction("Invoice requested by customer: " + customer.getName() + ", Project ID: " + invoiceProjectID);
                                                         System.out.println("Invoice created successfully!");
                                                     }
                                                     catch (Exception e) 
@@ -240,12 +244,15 @@ public class Main
                                                             {
                                                                 case "i":
                                                                     taskService.getByProject(project);
+                                                                    AuditService.getInstance().logAction("Tasks displayed for project: " + project.getName());
                                                                     break;
                                                                 case "ii":
                                                                     taskService.displayTasksByPriority();
+                                                                    AuditService.getInstance().logAction("Tasks displayed by priority for project: " + project.getName());
                                                                     break;
                                                                 case "iii":
                                                                     taskService.displayTasksByDeadline();
+                                                                    AuditService.getInstance().logAction("Tasks displayed by deadline for project: " + project.getName());
                                                                     break;
                                                                 default:
                                                                     System.out.println("Invalid choice. Please try again.");
@@ -266,6 +273,7 @@ public class Main
                                                             if (!alreadyAssigned)
                                                             {
                                                                 projectService.addMember(project, member);
+                                                                AuditService.getInstance().logAction("Project assigned to member: " + member.getName() + ", Project ID: " + project.getId());
                                                                 System.out.println("You have been assigned to the project.");
                                                             } 
                                                             break;
@@ -284,6 +292,7 @@ public class Main
                                                             {
                                                                 int nextIndex = taskService.getAll().size() + 1;
                                                                 taskService.add(new Task(nextIndex, taskName, priority, deadline, member, project));
+                                                                AuditService.getInstance().logAction("Task created by member: " + member.getName() + ", Task Name: " + taskName);
                                                                 System.out.println("Task created successfully!");
                                                             }
                                                             catch (Exception e) 
@@ -329,6 +338,7 @@ public class Main
                                                         {
                                                             case "a":
                                                                 taskService.showDetailsTask(task);
+                                                                AuditService.getInstance().logAction("Task details viewed by member: " + member.getName() + ", Task ID: " + taskID);
                                                                 break;
                                                             case "b":
                                                                 if (task.getStatus() == Status.TO_DO)
@@ -343,6 +353,7 @@ public class Main
                                                                 } 
                                                                 else 
                                                                     System.out.println("Task is already completed or in testing phase.");
+                                                                AuditService.getInstance().logAction("Task status modified by member: " + member.getName() + ", Task ID: " + taskID);
                                                                 break;
                                                             case "c":
                                                                 if (task.getStatus() == Status.TESTING)
@@ -358,12 +369,14 @@ public class Main
                                                                 }
                                                                 else 
                                                                     System.out.println("Task is not in testing phase. Cannot complete it.");
+                                                                AuditService.getInstance().logAction("Task testing status modified by member: " + member.getName() + ", Task ID: " + taskID);
                                                                 break;
                                                             case "d":
                                                                 System.out.println("Please enter the new priority (HIGH, MEDIUM, LOW):");
                                                                 String newPriorityInput = scanner.nextLine();
                                                                 Priority newPriority = Priority.valueOf(newPriorityInput.toUpperCase());
                                                                 taskService.modifyPriority(task, newPriority);
+                                                                AuditService.getInstance().logAction("Task priority modified by member: " + member.getName() + ", Task ID: " + taskID);
                                                                 break;
                                                             case "e":
                                                                 System.out.println("Please enter the new deadline (DD/MM/YYYY):");
@@ -371,11 +384,13 @@ public class Main
                                                                 LocalDate newDeadlineDate = LocalDate.parse(newDeadlineInput, java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                                                                 Deadline newDeadline = new Deadline(newDeadlineDate);
                                                                 taskService.modifyDeadline(task, newDeadline);
+                                                                AuditService.getInstance().logAction("Task deadline modified by member: " + member.getName() + ", Task ID: " + taskID);
                                                                 break;
                                                             case "f":
                                                                 if (!(task.getAssignedMember().getId() == member.getId())) 
                                                                 {
                                                                     taskService.assignTask(task, member);
+                                                                    AuditService.getInstance().logAction("Task assigned to member: " + member.getName() + ", Task ID: " + taskID);
                                                                     System.out.println("You have been assigned to the task.");
                                                                 } 
                                                                 else 
@@ -400,6 +415,7 @@ public class Main
                                             }
                                             if (!found5) 
                                                 System.out.println("You have no projects assigned.");
+                                            AuditService.getInstance().logAction("Projects viewed by member: " + member.getName());
                                             break;
                                         case "4":
                                             System.out.println("Your tasks:");
@@ -417,6 +433,7 @@ public class Main
                                             }
                                             if (!found6) 
                                                 System.out.println("You have no tasks assigned.");
+                                            AuditService.getInstance().logAction("Tasks viewed by member: " + member.getName());
                                             break;
                                         case "5":
                                             memberMenu = false;
@@ -472,6 +489,7 @@ public class Main
                                                 for (Project project : projectsD) 
                                                     System.out.println("Project ID: " + project.getId() + ", Name: " + project.getName());
                                             }
+                                            AuditService.getInstance().logAction("Projects viewed by manager: " + manager.getName());
                                             break;
                                         case "2":
                                             System.out.println("Please enter the project ID to view its details:");
@@ -502,12 +520,15 @@ public class Main
                                                             {
                                                                 case "i":
                                                                     projectService.getTasksByProject(project.getId());
+                                                                    AuditService.getInstance().logAction("Tasks displayed for project: " + project.getName());
                                                                     break;
                                                                 case "ii":
                                                                     taskService.displayTasksByPriority();
+                                                                    AuditService.getInstance().logAction("Tasks displayed by priority for project: " + project.getName());
                                                                     break;
                                                                 case "iii":
                                                                     taskService.displayTasksByDeadline();
+                                                                    AuditService.getInstance().logAction("Tasks displayed by deadline for project: " + project.getName());
                                                                     break;
                                                                 case "iv":
                                                                     System.out.println("Please enter the member ID to filter tasks by user:");
@@ -519,6 +540,7 @@ public class Main
                                                                         {
                                                                             found3 = true;
                                                                             taskService.displayTasksByUser(member);
+                                                                            AuditService.getInstance().logAction("Tasks displayed by user for project: " + project.getName());
                                                                             break;
                                                                         }
                                                                     }
@@ -544,6 +566,7 @@ public class Main
                                                             if (!alreadyAssigned)
                                                             {
                                                                 projectService.assignManager(project, manager);
+                                                                AuditService.getInstance().logAction("Project assigned to manager: " + manager.getName() + ", Project ID: " + project.getId());
                                                                 System.out.println("You have been assigned to the project.");
                                                             } 
                                                             break;
@@ -563,6 +586,7 @@ public class Main
                                                             {
                                                                 int nextIndex = taskService.getAll().size() + 1;
                                                                 taskService.add(new Task(nextIndex, taskName, priority, deadline, project));
+                                                                AuditService.getInstance().logAction("Task created by manager: " + manager.getName() + ", Task Name: " + taskName);
                                                             }
                                                             catch (Exception e) 
                                                             {
@@ -580,6 +604,7 @@ public class Main
                                                                 {
                                                                     memberToAdd = member;
                                                                     projectService.addMember(project, memberToAdd);
+                                                                    AuditService.getInstance().logAction("Member added to project: " + memberToAdd.getName() + ", Project ID: " + project.getId());
                                                                     System.out.println("Member added to the project successfully!");
                                                                     break;
                                                                 }
@@ -598,6 +623,7 @@ public class Main
                                                                 {
                                                                     memberToRemove = member;
                                                                     projectService.removeMember(project, memberToRemove);
+                                                                    AuditService.getInstance().logAction("Member removed from project: " + memberToRemove.getName() + ", Project ID: " + project.getId());
                                                                     System.out.println("Member removed from the project successfully!");
                                                                     break;
                                                                 }
@@ -609,6 +635,7 @@ public class Main
                                                             try
                                                             {
                                                                 invoiceService.add(new Invoice(project));
+                                                                AuditService.getInstance().logAction("Invoice generated for project: " + project.getName());
                                                                 System.out.println("Invoice created successfully!");
                                                             }
                                                             catch (Exception e) 
@@ -657,12 +684,14 @@ public class Main
                                                     {
                                                         case "a":
                                                             taskService.showDetailsTask(task1);
+                                                            AuditService.getInstance().logAction("Task details viewed by manager: " + manager.getName() + ", Task ID: " + taskID);
                                                             break;
                                                         case "b":
                                                             System.out.println("Please enter the new priority (HIGH, MEDIUM, LOW):");
                                                             String newPriorityInput = scanner.nextLine();
                                                             Priority newPriority = Priority.valueOf(newPriorityInput.toUpperCase());
                                                             taskService.modifyPriority(task1, newPriority);
+                                                            AuditService.getInstance().logAction("Task priority modified by manager: " + manager.getName() + ", Task ID: " + taskID);
                                                             break;
                                                         case "c":
                                                             System.out.println("Please enter the new deadline (DD/MM/YYYY):");
@@ -670,6 +699,7 @@ public class Main
                                                             LocalDate newDeadlineDate = LocalDate.parse(newDeadlineInput, java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                                                             Deadline newDeadline = new Deadline(newDeadlineDate);
                                                             taskService.modifyDeadline(task1, newDeadline);
+                                                            AuditService.getInstance().logAction("Task deadline modified by manager: " + manager.getName() + ", Task ID: " + taskID);
                                                             break;
                                                         case "d":
                                                             System.out.println("Please enter the member ID to assign the task to:");
@@ -682,6 +712,7 @@ public class Main
                                                                 {
                                                                     memberToAssign = member;
                                                                     taskService.assignTask(task1, memberToAssign);
+                                                                    AuditService.getInstance().logAction("Task assigned to member: " + memberToAssign.getName() + ", Task ID: " + taskID);
                                                                     System.out.println("Task assigned to member successfully!");
                                                                     break;
                                                                 }
@@ -712,6 +743,7 @@ public class Main
                                             }
                                             if (!found7) 
                                                 System.out.println("You have no projects assigned.");
+                                            AuditService.getInstance().logAction("Projects viewed by manager: " + manager.getName());
                                             break;
                                         case "5":
                                             managerMenu = false;

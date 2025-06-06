@@ -30,6 +30,7 @@ public class CustomerService extends GenericService<Customer>
             pstmt.setString(3, customer.getEmail());
             pstmt.setString(4, customer.getCustomerID());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("AddCustomer");
         }
     }
 
@@ -47,6 +48,7 @@ public class CustomerService extends GenericService<Customer>
                 Customer customer = new Customer(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("customer_id"));
                 customers.add(customer);
             }
+            //AuditService.getInstance().logAction("GetAllCustomers");
         }
         return customers;
     }
@@ -61,6 +63,7 @@ public class CustomerService extends GenericService<Customer>
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) 
             {
+                //AuditService.getInstance().logAction("GetCustomerById");
                 return new Customer(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("customer_id"));
             }
         }
@@ -78,6 +81,7 @@ public class CustomerService extends GenericService<Customer>
             pstmt.setString(2, customer.getEmail());
             pstmt.setInt(3, customer.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("UpdateCustomer");
         }
     }
 
@@ -90,6 +94,7 @@ public class CustomerService extends GenericService<Customer>
         {
             pstmt.setInt(1, customer.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("DeleteCustomer");
         }
     }
 }

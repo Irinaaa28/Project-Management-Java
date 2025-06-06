@@ -43,6 +43,7 @@ public class ProjectService extends GenericService<Project>
             pstmt.setDouble(8, project.getProgress());
             pstmt.setInt(9, project.getLateDays());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("AddProject");
         }
     }
 
@@ -84,6 +85,7 @@ public class ProjectService extends GenericService<Project>
                 }
             }
         }
+        //AuditService.getInstance().logAction("GetAllProjects");
         return projects;
     }
 
@@ -111,10 +113,14 @@ public class ProjectService extends GenericService<Project>
                     if (managerId != 0)
                     {
                         manager = ManagerService.getInstance().getById(managerId);
+                        //AuditService.getInstance().logAction("GetProjectById");
                         return new Project(id, name, manager, customer, new Deadline(deadlineDate));
                     }
                     else
+                    {
+                        //AuditService.getInstance().logAction("GetProjectById");
                         return new Project(id, name, customer, new Deadline(deadlineDate));
+                    }
                 }
                 catch (Exception e)
                 {
@@ -157,6 +163,7 @@ public class ProjectService extends GenericService<Project>
                     }
                     else
                         projects.add(new Project(id, name, customer, new Deadline(deadlineDate)));
+                    
                 }
                 catch (Exception e)
                 {
@@ -164,6 +171,7 @@ public class ProjectService extends GenericService<Project>
                 }
             }
         }
+        //AuditService.getInstance().logAction("GetProjectsByMember");
         return projects;
     }
 
@@ -198,6 +206,7 @@ public class ProjectService extends GenericService<Project>
                 }
             }
         }
+        //AuditService.getInstance().logAction("GetProjectsByManager");
         return projects;
     }
 
@@ -227,6 +236,7 @@ public class ProjectService extends GenericService<Project>
                 tasks.add(task);
             }
         }
+        //AuditService.getInstance().logAction("GetTasksByProject");
         return tasks;
     }
 
@@ -244,6 +254,7 @@ public class ProjectService extends GenericService<Project>
                      pstmt.setInt(1, manager.getId());
                      pstmt.setInt(2, project.getId());
                 pstmt.executeUpdate();
+                //AuditService.getInstance().logAction("AssignManagerToProject");
             }
 
         }
@@ -266,6 +277,7 @@ public class ProjectService extends GenericService<Project>
                 pstmt.setInt(1, project.getId());
                 pstmt.setInt(2, member.getId());
                 pstmt.executeUpdate();
+                //AuditService.getInstance().logAction("AddMemberToProject");
             }
         } 
         catch (Exception e) 
@@ -285,6 +297,7 @@ public class ProjectService extends GenericService<Project>
                 pstmt.setInt(1, project.getId());
                 pstmt.setInt(2, member.getId());
                 pstmt.executeUpdate();
+                //AuditService.getInstance().logAction("RemoveMemberFromProject");
             }
         } 
         catch (Exception e) 
@@ -352,6 +365,7 @@ public class ProjectService extends GenericService<Project>
                 System.out.println(" - " + task.getName() + " (Status: " + task.getStatus() + ", Priority: " + task.getPriority() + ")");
             }
         }
+
     }
 
     @Override
@@ -370,6 +384,7 @@ public class ProjectService extends GenericService<Project>
             pstmt.setInt(8, project.getLateDays());
             pstmt.setInt(9, project.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("UpdateProject");
         }
     }
 
@@ -392,6 +407,7 @@ public class ProjectService extends GenericService<Project>
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, project.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("DeleteProject");
         }
     }
 

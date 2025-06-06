@@ -38,6 +38,7 @@ public class TaskService extends GenericService<Task>
                 pstmt.setNull(6, Types.INTEGER); 
             pstmt.setInt(7, task.getProject().getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("AddTask");
         }   
     }
 
@@ -68,6 +69,7 @@ public class TaskService extends GenericService<Task>
                 Task task = new Task(id, name, priority, new Deadline(deadlineDate), assignedMember, project);
                 tasks.add(task);
             }
+            //AuditService.getInstance().logAction("GetAllTasks");
             return tasks;
         }
     }
@@ -94,6 +96,7 @@ public class TaskService extends GenericService<Task>
                     else
                         assignedMember = new Member(); 
                     Project project = ProjectService.getInstance().getById(projectId);
+                    //AuditService.getInstance().logAction("GetTaskById");
                     return new Task(id, name, priority, new Deadline(deadlineDate), assignedMember, project);
                 }
             }
@@ -130,6 +133,7 @@ public class TaskService extends GenericService<Task>
         }
         for (Task t: tasks)
             System.out.println("Task Name: " + t.getName() + ", Status: " + t.getStatus() + ", Priority: " + t.getPriority() + ", Deadline: " + t.getDeadline().getDate().toString());
+        //AuditService.getInstance().logAction("GetTasksByProject");    
         return tasks;
     }
 
@@ -161,6 +165,7 @@ public class TaskService extends GenericService<Task>
                     Priority priority = Priority.valueOf(priorityStr.toUpperCase());
                     Task task = new Task(id, name, priority, new Deadline(deadlineDate), member);
                     showDetailsTask(task);
+
                 }
             }
         } 
@@ -257,6 +262,7 @@ public class TaskService extends GenericService<Task>
             else 
                 pstmt.setNull(5, Types.INTEGER); 
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("UpdateTask");
         }
     }
 
@@ -268,6 +274,7 @@ public class TaskService extends GenericService<Task>
             pstmt.setInt(1, member.getId());
             pstmt.setInt(2, task.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("AssignTask");
         }
     }
 
@@ -279,6 +286,7 @@ public class TaskService extends GenericService<Task>
             pstmt.setString(1, status.toString());
             pstmt.setInt(2, task.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("ModifyTaskStatus");
         }
     }
 
@@ -290,6 +298,7 @@ public class TaskService extends GenericService<Task>
             pstmt.setString(1, priority.toString());
             pstmt.setInt(2, task.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("ModifyTaskPriority");
         }
     }
 
@@ -301,6 +310,7 @@ public class TaskService extends GenericService<Task>
             pstmt.setDate(1, java.sql.Date.valueOf(deadline.getDate()));
             pstmt.setInt(2, task.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("ModifyTaskDeadline");
         }
     }
 
@@ -312,6 +322,7 @@ public class TaskService extends GenericService<Task>
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, task.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("DeleteTask");
         }
     }
 }

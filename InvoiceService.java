@@ -35,6 +35,7 @@ public class InvoiceService extends GenericService<Invoice>
             pstmt.setDouble(4, invoice.getAmount());
             pstmt.setBoolean(5, invoice.isReleased());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("AddInvoice");
         }
     }
 
@@ -59,6 +60,7 @@ public class InvoiceService extends GenericService<Invoice>
                 invoice.setReleased(isReleased);
                 invoices.add(invoice);
             }
+            //AuditService.getInstance().logAction("GetAllInvoices");
         }
         return null; 
     }
@@ -75,6 +77,7 @@ public class InvoiceService extends GenericService<Invoice>
             pstmt.setBoolean(4, invoice.isReleased());
             pstmt.setInt(5, invoice.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("UpdateInvoice");
         }
     }
 
@@ -86,6 +89,7 @@ public class InvoiceService extends GenericService<Invoice>
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, invoice.getId());
             pstmt.executeUpdate();
+            //AuditService.getInstance().logAction("DeleteInvoice");
         }
     }
     
